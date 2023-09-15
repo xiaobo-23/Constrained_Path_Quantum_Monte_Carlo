@@ -1,0 +1,32 @@
+ 64  04                            ! NumL1, NumL2
+ T   T                             ! IfPr1, IfPr2
+-1.000  -1.000   0                 ! Hopt1Up, Hopt1Dn, EkDispType
++0.000  +0.000                     ! Hopt2, Hopt3
++0.000                             ! ZmFdz
++0.00000   0                       ! PinSz, PinSzType
++8.0000    0.00000                 ! HubbU, ChemP
+ T                                 ! ifSinusoidalPinning
++0.100     16.000                  ! SinusoidalPinSz, LambdaSz
+ T   1                             ! SymTrotDcp, HS_Type
+ F   F   F                         ! FFTEXPDTH0, FFTEXPDTHT, IfFftEnPar
+ 3  +0.000   3                     ! MuBTType, ChemP_BT, NItrGetMuT
+ 0   08                            ! UpdtMethod, NblkUDelay
+ 50                                ! NWalk
++5.000  +0.200                     ! PopWghtMax, PopWghtMin
+ T  +0.020                         ! IfSetDltau, FixedDltau
+003.0000000000  00150              ! BetaT, LTrot
+ T   25                            ! IfFixnT, NSwepFix
+ 1  224.000   0.87500000           ! FixNenT, NumNe, Fix_nT
++3.50000000  +1.00000000           ! ChPSmallnT, ChPLargenT
+ T                                 ! IfSwepReWt
+012  010  002                      ! NmBin, NSwep, nWarm
+020  010                           ! NvStb, NvStbOut
+005  010                           ! NvPop, NvPopOut
+ T   020  020                      ! IfM2OneMea, NvStbM2One, NvMeaM2One
+ F   00                            ! IfCutSmLg, NmBinCut
+ T   T   1   050                   ! IfTAU, IfTau0Rand, NmTDMType, NmTDM
+ T   01                            ! IfEqDistDt, NvMeaDyn
+ T   T   T                         ! IfDyGrFOut, IfDySpnOut, IfDyDenOut
+ T   T   T                         ! IfDyPstOut, IfDyDWvOut, IfDyCurrnt
+ T   F   F                         ! IfSaveFlds, SaveFldMea, ReadFldMea
+Output

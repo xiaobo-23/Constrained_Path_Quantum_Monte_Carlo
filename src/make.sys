@@ -1,0 +1,94 @@
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++ (0) fortran compiler, linker, and archiver +++++++++++++++++++++++++++++++++++++++++
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+##################################################################################################
+######################## [0] The choices of compilers for fortran ################################
+##################################################################################################
+    F90 = mpifort  ### The newest MPI parallel compiler
+##  F90 = mpiifort ### The new    MPI parallel compiler
+##  F90 = mpif90   ### The old    MPI parallel compiler
+##  F90 = gfortran ### The GUN   serial compiler 
+##  F90 = ifort    ### The intel serial   compiler
+##################################################################################################
+######################## [1] Take all .o files into single one ###################################
+##################################################################################################
+    LINKER = $(F90)
+    ARCHIVER = ar -ruv
+
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++ (1) linear algebra library --> Using intel MKL +++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++++++ Should set MKLROOT path on corresponding Supercomputer +++++++++++++++++++++++++
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+##################################################################################################
+########################### [0] For linux system #################################################
+##################################################################################################
+##_________________________________________________________________________________
+##__________________ <0> For the serial and MPI parallel versions _________________
+##_________________________________________________________________________________
+    LIBS = -L${MKLROOT}/lib/intel64/ -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+##  LIBS = -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a        \
+                             ${MKLROOT}/lib/intel64/libmkl_core.a              \
+                             ${MKLROOT}/lib/intel64/libmkl_sequential.a        \
+           -Wl,--end-group -lpthread -lm
+##_________________________________________________________________________________
+##__________________ <1> For the MPI+OMP parallel version _________________________
+##_________________________________________________________________________________
+##  INCLUDE = -qopenmp -I${MKLROOT}/include
+##  LIBS    = -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a        \
+                                ${MKLROOT}/lib/intel64/libmkl_core.a              \
+                                ${MKLROOT}/lib/intel64/libmkl_intel_thread.a      \
+              -Wl,--end-group -liomp5 -lpthread -lm -ldl
+
+
+
+##################################################################################################
+########################### [1] For macOs system #################################################
+##################################################################################################
+##_________________________________________________________________________________
+##__________________ <0> For the serial and MPI parallel versions _________________
+##_________________________________________________________________________________
+##  LIBS = -L${MKLROOT}/lib/ -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+##  INCLUDE = -I${MKLROOT}/include
+##  LIBS    = ${MKLROOT}/lib/libmkl_intel_lp64.a        \
+              ${MKLROOT}/lib/libmkl_core.a              \
+              ${MKLROOT}/lib/libmkl_sequential.a        \
+              -lpthread -lm -ldl
+##_________________________________________________________________________________
+##__________________ <1> For the MPI+OMP parallel version _________________________
+##_________________________________________________________________________________
+##  INCLUDE = -qopenmp -I${MKLROOT}/include
+##  LIBS    = ${MKLROOT}/lib/libmkl_intel_lp64.a        \
+              ${MKLROOT}/lib/libmkl_core.a              \
+              ${MKLROOT}/lib/libmkl_intel_thread.a      \
+              -liomp5 -lpthread -lm -ldl
+ 
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++ (2) fortran preprocessor options, common setting +++++++++++++++++++++++++++++++++++
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    API = # -DAPI -DMPY
+    FPP = -cpp
+##  FPP = -fpp
+##  RUNMODE = -DQRSTABLIZE # -DCHECKMATDM # -DOMPTHREADS
+    RUNMODE = -DMPIPROCESS -DQRSTABLIZE   # -DOMPTHREADS
+##  RUNMODE = -DMPIPROCESS -DQRSTABLIZE -DOMPTHREADS # -DDCPDNOSIGN 
+##  RUNMODE = -DMPIPROCESS -DQRSTABLIZE # -DCHECKMATDM # -DOMPTHREADS
+    CPP = $(FPP) $(RUNMODE) $(API)
+
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++ (3) machine tuning options for compile +++++++++++++++++++++++++++++++++++++++++++++
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    GPROF = # -pg
+##  CHECK = -Wline-truncation -Wcharacter-truncation -fcheck=all -fbacktrace
+##  CHECK = -warn all -check all -traceback -g -nogen-interfaces
+##  CDUMP = -vec-report2 -openmp-report2 -nogen-interfaces
+##  LEVEL = -O3 -march=core-avx2  -unroll-aggressive  -align all
+##  LEVEL = -O3 -march=core-avx-i -unroll-aggressive  -align all
+    LEVEL = -O3   
+##  LEVEL = -O3  -march=native  -fimplicit-none  -Wall  -Wline-truncation
+##  MARCH = # -march=corei7-avx # core2 corei7 corei7-avx core-avx-i core-avx2
+
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+## +++++++++++++++++++++++++ (4) flags for compiler and linker ++++++++++++++++++++++++++++++++++++++++++++++++++
+## ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    FFLAGS = -c $(CPP) $(CHECK) $(CDUMP) $(LEVEL) $(MARCH) $(GPROF) $(INCLUDE)
+    LFLAGS = $(GPROF)
